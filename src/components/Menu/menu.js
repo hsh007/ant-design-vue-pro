@@ -140,6 +140,10 @@ const SMenu = {
         this.openKeys = latestOpenKey ? [latestOpenKey] : []
       }
     },
+    onSelect ({ item, key, selectedKeys }) {
+      this.selectedKeys = selectedKeys
+      this.$emit('select', { item, key, selectedKeys })
+    },
     updateMenu () {
       const routes = this.$route.matched.concat()
       const { hidden } = this.$route.meta
@@ -171,21 +175,20 @@ const SMenu = {
         this.selectedKeys = obj.selectedKeys
         this.$emit('select', obj)
       },
-      openChange: this.onOpenChange
+      on: {
+        openChange: this.onOpenChange,
+        select: this.onSelect
+      }
     }
 
-    const menuTree = menu.map(item => {
+    const menuTree = this.menu.map(item => {
       if (item.hidden) {
         return null
       }
       return renderItem(h, item, i18nRender)
     })
-    // {...{ props, on: on }}
-    return (
-      <Menu vModel={this.selectedKeys} {...{ props, on: on }}>
-        {menuTree}
-      </Menu>
-    )
+
+    return (<Menu {...dynamicProps}>{menuTree}</Menu>)
   }
 }
 
